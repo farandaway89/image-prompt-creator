@@ -793,6 +793,47 @@ class ImageGenerator {
         return parts[0].trim();
     }
     
+    async testAPI() {
+        const apiKey = this.apiKeyInput.value.trim();
+        if (!apiKey) {
+            console.log('❌ No API key for testing');
+            return;
+        }
+
+        console.log('🧪 Testing Hugging Face API connectivity...');
+        
+        const models = [
+            'stabilityai/stable-diffusion-2-1',
+            'runwayml/stable-diffusion-v1-5',
+            'CompVis/stable-diffusion-v1-4'
+        ];
+
+        for (const model of models) {
+            try {
+                console.log(`Testing model: ${model}`);
+                const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({inputs: "test"})
+                });
+                
+                console.log(`✅ ${model}: Status ${response.status}`);
+                if (response.ok) {
+                    console.log(`🎯 Working model found: ${model}`);
+                    return model;
+                }
+            } catch (error) {
+                console.log(`❌ ${model}: ${error.message}`);
+            }
+        }
+        
+        console.log('❌ No working models found');
+        return null;
+    }
+
     async generateWithHuggingFace(prompt) {
         try {
             console.log('Attempting to generate with prompt:', prompt);
@@ -804,8 +845,15 @@ class ImageGenerator {
                 this.promptCreator.showToast('API 키가 필요합니다. 키를 입력하거나 Canvas 생성을 사용하세요.', 'info');
                 return false;
             }
+
+            // Test API first
+            const workingModel = await this.testAPI();
+            if (!workingModel) {
+                this.promptCreator.showToast('사용 가능한 모델이 없습니다. Canvas 생성을 사용합니다.', 'info');
+                return false;
+            }
             
-            const model = "runwayml/stable-diffusion-v1-5";
+            const model = workingModel;
             
             const headers = {
                 'Authorization': `Bearer ${apiKey}`,
@@ -996,9 +1044,9 @@ class ImageGenerator {
             width/2, height/2, Math.max(width, height)/2
         );
         
-        gradient.addColorStop(0, data.colors[0] + '40');
-        gradient.addColorStop(0.5, data.colors[1] + '20');
-        gradient.addColorStop(1, data.colors[2] + '60');
+        gradient.addColorStop(0, this.addOpacity(data.colors[0], 0.25));
+        gradient.addColorStop(0.5, this.addOpacity(data.colors[1], 0.12));
+        gradient.addColorStop(1, this.addOpacity(data.colors[2], 0.38));
         
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, width, height);
@@ -1248,13 +1296,19 @@ class ImageGenerator {
     }
     
     darkenColor(color) {
-        // Simple color darkening - return original color with opacity
-        return color + '99';
+        // Return original color - no modification to avoid parsing issues
+        return color;
     }
     
     brightenColor(color) {
-        // Simple color brightening - return original color with opacity
-        return color + 'DD';
+        // Return original color - no modification to avoid parsing issues  
+        return color;
+    }
+    
+    addOpacity(color, opacity) {
+        // Safely add opacity to hex color
+        const alpha = Math.floor(opacity * 255).toString(16).padStart(2, '0');
+        return color + alpha;
     }
     
     showLoading() {
