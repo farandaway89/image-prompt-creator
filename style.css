@@ -16,8 +16,8 @@
   --bg-glass: rgba(255, 255, 255, 0.1);
   
   /* Text Colors */
-  --text-primary: #2d3748;
-  --text-secondary: #718096;
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
   --text-accent: #667eea;
   --text-white: #ffffff;
   
@@ -144,10 +144,8 @@ body::before {
 .logo h1 {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ffffff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .version {
@@ -204,19 +202,19 @@ body::before {
 .hero-content h2 {
   font-size: var(--font-size-3xl);
   font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   margin-bottom: var(--spacing-md);
   line-height: 1.2;
 }
 
 .hero-content p {
   font-size: var(--font-size-lg);
-  color: var(--text-secondary);
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
   max-width: 600px;
   margin: 0 auto;
+  opacity: 0.95;
 }
 
 /* Generator Section */
@@ -498,10 +496,8 @@ textarea {
   font-weight: 700;
   text-align: center;
   margin-bottom: var(--spacing-lg);
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .templates-grid {
@@ -567,10 +563,8 @@ textarea {
 .history-header h3 {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
+  text-shadow: none;
 }
 
 .btn-sm {
