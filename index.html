@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Prompt Creator - AI 이미지 프롬프트 생성기</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-magic"></i>
+                    <h1>Image Prompt Creator</h1>
+                    <span class="version">v1.0</span>
+                </div>
+                <div class="header-actions">
+                    <button class="theme-toggle" id="theme-toggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="help-btn" id="help-btn">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Hero Section -->
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <h2>AI 이미지 프롬프트 생성기</h2>
+                        <p>창의적이고 구체적인 AI 이미지 생성 프롬프트를 자동으로 만들어보세요</p>
+                    </div>
+                </section>
+
+                <!-- Main Generator -->
+                <section class="generator-section">
+                    <div class="input-panel">
+                        <div class="input-group">
+                            <label for="basic-idea">기본 아이디어 <span class="required">*</span></label>
+                            <textarea 
+                                id="basic-idea" 
+                                placeholder="예: 고양이, 판타지 성, 우주 정거장..."
+                                maxlength="200"></textarea>
+                            <div class="char-counter">0/200</div>
+                        </div>
+
+                        <div class="options-grid">
+                            <div class="option-group">
+                                <label>이미지 스타일</label>
+                                <select id="image-style">
+                                    <option value="">선택하세요</option>
+                                    <option value="photorealistic">포토리얼리스틱</option>
+                                    <option value="anime">애니메이션</option>
+                                    <option value="digital-art">디지털 아트</option>
+                                    <option value="oil-painting">유화</option>
+                                    <option value="watercolor">수채화</option>
+                                    <option value="sketch">스케치</option>
+                                    <option value="3d-render">3D 렌더링</option>
+                                    <option value="pixel-art">픽셀 아트</option>
+                                    <option value="comic">만화</option>
+                                    <option value="vintage">빈티지</option>
+                                </select>
+                            </div>
+
+                            <div class="option-group">
+                                <label>분위기/무드</label>
+                                <select id="mood">
+                                    <option value="">선택하세요</option>
+                                    <option value="bright-cheerful">밝고 활기찬</option>
+                                    <option value="dark-mysterious">어둡고 신비로운</option>
+                                    <option value="calm-peaceful">차분하고 평화로운</option>
+                                    <option value="dramatic-intense">드라마틱하고 강렬한</option>
+                                    <option value="dreamy-ethereal">몽환적이고 환상적인</option>
+                                    <option value="nostalgic">향수를 불러일으키는</option>
+                                    <option value="futuristic">미래적인</option>
+                                    <option value="romantic">로맨틱한</option>
+                                    <option value="scary-horror">무서운</option>
+                                </select>
+                            </div>
+
+                            <div class="option-group">
+                                <label>색상 팔레트</label>
+                                <select id="color-palette">
+                                    <option value="">선택하세요</option>
+                                    <option value="warm">따뜻한 색상</option>
+                                    <option value="cool">차가운 색상</option>
+                                    <option value="monochrome">흑백</option>
+                                    <option value="pastel">파스텔</option>
+                                    <option value="vibrant">생생한</option>
+                                    <option value="earth-tones">자연색</option>
+                                    <option value="neon">네온</option>
+                                    <option value="sunset">석양</option>
+                                    <option value="ocean">바다</option>
+                                </select>
+                            </div>
+
+                            <div class="option-group">
+                                <label>구도/시점</label>
+                                <select id="composition">
+                                    <option value="">선택하세요</option>
+                                    <option value="close-up">클로즈업</option>
+                                    <option value="medium-shot">미디엄 샷</option>
+                                    <option value="wide-shot">와이드 샷</option>
+                                    <option value="birds-eye">조감도</option>
+                                    <option value="low-angle">로우 앵글</option>
+                                    <option value="high-angle">하이 앵글</option>
+                                    <option value="first-person">1인칭 시점</option>
+                                    <option value="panoramic">파노라마</option>
+                                </select>
+                            </div>
+
+                            <div class="option-group">
+                                <label>시간대</label>
+                                <select id="time-of-day">
+                                    <option value="">선택하세요</option>
+                                    <option value="dawn">새벽</option>
+                                    <option value="morning">아침</option>
+                                    <option value="noon">정오</option>
+                                    <option value="afternoon">오후</option>
+                                    <option value="sunset">석양</option>
+                                    <option value="dusk">황혼</option>
+                                    <option value="night">밤</option>
+                                    <option value="midnight">자정</option>
+                                </select>
+                            </div>
+
+                            <div class="option-group">
+                                <label>품질 설정</label>
+                                <select id="quality">
+                                    <option value="">선택하세요</option>
+                                    <option value="ultra-detailed">초고해상도</option>
+                                    <option value="high-quality">고품질</option>
+                                    <option value="8k">8K 품질</option>
+                                    <option value="4k">4K 품질</option>
+                                    <option value="hd">HD 품질</option>
+                                    <option value="masterpiece">걸작 수준</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="advanced-options">
+                            <button class="advanced-toggle" id="advanced-toggle">
+                                <i class="fas fa-cog"></i>
+                                고급 설정
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            
+                            <div class="advanced-content" id="advanced-content">
+                                <div class="input-group">
+                                    <label for="additional-details">추가 디테일</label>
+                                    <textarea 
+                                        id="additional-details" 
+                                        placeholder="예: 금색 테두리, 빛나는 효과, 꽃잎이 흩날리는..."
+                                        maxlength="300"></textarea>
+                                    <div class="char-counter">0/300</div>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="exclude-elements">제외할 요소</label>
+                                    <input 
+                                        type="text" 
+                                        id="exclude-elements" 
+                                        placeholder="예: 사람, 텍스트, 블러 효과..."
+                                        maxlength="150">
+                                </div>
+
+                                <div class="option-group">
+                                    <label>아티스트 스타일</label>
+                                    <select id="artist-style">
+                                        <option value="">선택하세요</option>
+                                        <option value="van-gogh">반 고흐</option>
+                                        <option value="picasso">피카소</option>
+                                        <option value="monet">모네</option>
+                                        <option value="da-vinci">다 빈치</option>
+                                        <option value="banksy">뱅크시</option>
+                                        <option value="studio-ghibli">지브리 스튜디오</option>
+                                        <option value="disney">디즈니</option>
+                                        <option value="cyberpunk">사이버펑크</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="generate-btn">
+                                <i class="fas fa-magic"></i>
+                                프롬프트 생성하기
+                            </button>
+                            <button class="btn btn-secondary" id="random-btn">
+                                <i class="fas fa-dice"></i>
+                                랜덤 생성
+                            </button>
+                            <button class="btn btn-outline" id="clear-btn">
+                                <i class="fas fa-eraser"></i>
+                                초기화
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Results Panel -->
+                    <div class="results-panel">
+                        <div class="result-header">
+                            <h3>생성된 프롬프트</h3>
+                            <div class="result-actions">
+                                <button class="btn-icon" id="copy-btn" title="복사">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="btn-icon" id="save-btn" title="저장">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                                <button class="btn-icon" id="share-btn" title="공유">
+                                    <i class="fas fa-share"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="result-content" id="result-content">
+                            <div class="placeholder">
+                                <i class="fas fa-lightbulb"></i>
+                                <p>옵션을 선택하고 '프롬프트 생성하기' 버튼을 눌러주세요!</p>
+                            </div>
+                        </div>
+
+                        <div class="result-stats" id="result-stats">
+                            <div class="stat">
+                                <span class="stat-label">단어 수:</span>
+                                <span class="stat-value" id="word-count">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">문자 수:</span>
+                                <span class="stat-value" id="char-count">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">복잡도:</span>
+                                <span class="stat-value" id="complexity">간단</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Preset Templates -->
+                <section class="templates-section">
+                    <h3>프리셋 템플릿</h3>
+                    <div class="templates-grid">
+                        <div class="template-card" data-template="portrait">
+                            <div class="template-icon">👤</div>
+                            <h4>인물 사진</h4>
+                            <p>사실적인 인물 사진 생성용</p>
+                        </div>
+                        <div class="template-card" data-template="landscape">
+                            <div class="template-icon">🏔️</div>
+                            <h4>풍경 사진</h4>
+                            <p>아름다운 자연 풍경 생성용</p>
+                        </div>
+                        <div class="template-card" data-template="fantasy">
+                            <div class="template-icon">🧙‍♂️</div>
+                            <h4>판타지</h4>
+                            <p>판타지 아트워크 생성용</p>
+                        </div>
+                        <div class="template-card" data-template="scifi">
+                            <div class="template-icon">🚀</div>
+                            <h4>공상과학</h4>
+                            <p>미래적 SF 이미지 생성용</p>
+                        </div>
+                        <div class="template-card" data-template="anime">
+                            <div class="template-icon">🎌</div>
+                            <h4>애니메이션</h4>
+                            <p>애니메이션 스타일 생성용</p>
+                        </div>
+                        <div class="template-card" data-template="abstract">
+                            <div class="template-icon">🎨</div>
+                            <h4>추상 미술</h4>
+                            <p>추상적 아트워크 생성용</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- History Section -->
+                <section class="history-section">
+                    <div class="history-header">
+                        <h3>최근 생성 기록</h3>
+                        <button class="btn btn-outline btn-sm" id="clear-history">
+                            <i class="fas fa-trash"></i>
+                            기록 삭제
+                        </button>
+                    </div>
+                    <div class="history-list" id="history-list">
+                        <div class="history-empty">
+                            <i class="fas fa-history"></i>
+                            <p>생성 기록이 없습니다</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Help Modal -->
+        <div class="modal" id="help-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>사용 방법</h3>
+                    <button class="close-btn" id="close-help">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="help-section">
+                        <h4>기본 사용법</h4>
+                        <ol>
+                            <li>기본 아이디어에 원하는 이미지의 핵심 요소를 입력하세요</li>
+                            <li>스타일, 분위기, 색상 등 옵션을 선택하세요</li>
+                            <li>'프롬프트 생성하기' 버튼을 클릭하세요</li>
+                            <li>생성된 프롬프트를 복사하여 AI 이미지 생성기에 사용하세요</li>
+                        </ol>
+                    </div>
+                    <div class="help-section">
+                        <h4>팁</h4>
+                        <ul>
+                            <li>구체적이고 명확한 설명이 더 좋은 결과를 만듭니다</li>
+                            <li>프리셋 템플릿을 활용하면 빠르게 시작할 수 있습니다</li>
+                            <li>고급 설정에서 더 세밀한 조정이 가능합니다</li>
+                            <li>제외할 요소를 명시하면 원하지 않는 결과를 피할 수 있습니다</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="toast" id="toast">
+            <div class="toast-content">
+                <i class="fas fa-check-circle"></i>
+                <span class="toast-message"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
