@@ -651,10 +651,7 @@ class ImagePromptCreator {
     }
 }
 
-// Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new ImagePromptCreator();
-});
+// This initialization is moved to the bottom
 
 // Add some CSS for history items
 const additionalCSS = `
@@ -1147,6 +1144,7 @@ class ImageGenerator {
 
 // Initialize Image Generator with Prompt Creator
 document.addEventListener('DOMContentLoaded', () => {
-    const promptCreator = new ImagePromptCreator();
-    const imageGenerator = new ImageGenerator(promptCreator);
+    // Single initialization point to avoid conflicts
+    window.promptCreator = new ImagePromptCreator();
+    window.imageGenerator = new ImageGenerator(window.promptCreator);
 });
