@@ -708,3 +708,445 @@ const additionalCSS = `
 const style = document.createElement('style');
 style.textContent = additionalCSS;
 document.head.appendChild(style);
+
+// ========================================
+// Image Generation Module
+// ========================================
+
+class ImageGenerator {
+    constructor(promptCreator) {
+        this.promptCreator = promptCreator;
+        this.canvas = document.getElementById('image-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.placeholder = document.getElementById('canvas-placeholder');
+        this.generateBtn = document.getElementById('generate-image-btn');
+        this.downloadBtn = document.getElementById('download-image-btn');
+        this.regenerateBtn = document.getElementById('regenerate-btn');
+        this.imageActions = document.getElementById('image-actions');
+        
+        this.setupEventListeners();
+        this.setupCanvas();
+    }
+    
+    setupEventListeners() {
+        this.generateBtn.addEventListener('click', () => this.generateImage());
+        this.downloadBtn.addEventListener('click', () => this.downloadImage());
+        this.regenerateBtn.addEventListener('click', () => this.generateImage());
+    }
+    
+    setupCanvas() {
+        // Set canvas size
+        this.canvas.width = 512;
+        this.canvas.height = 512;
+        
+        // Enable image generation when prompt is available
+        const originalDisplayResult = this.promptCreator.displayResult.bind(this.promptCreator);
+        this.promptCreator.displayResult = (prompt) => {
+            originalDisplayResult(prompt);
+            this.enableImageGeneration();
+        };
+    }
+    
+    enableImageGeneration() {
+        this.generateBtn.disabled = false;
+        this.generateBtn.style.opacity = '1';
+        this.generateBtn.style.cursor = 'pointer';
+    }
+    
+    generateImage() {
+        if (!this.promptCreator.currentPrompt) {
+            this.promptCreator.showToast('먼저 프롬프트를 생성해주세요!', 'error');
+            return;
+        }
+        
+        this.showLoading();
+        
+        // Parse prompt for image generation
+        const promptData = this.parsePrompt(this.promptCreator.currentPrompt);
+        
+        // Generate image based on prompt
+        setTimeout(() => {
+            this.createAbstractArt(promptData);
+            this.hideLoading();
+            this.showImageActions();
+        }, 2000);
+    }
+    
+    parsePrompt(prompt) {
+        const data = {
+            colors: ['#667eea', '#764ba2', '#f093fb', '#f5576c'],
+            mood: 'neutral',
+            complexity: 'medium',
+            style: 'abstract',
+            shapes: 'mixed'
+        };
+        
+        // Parse colors from prompt
+        if (prompt.includes('warm colors') || prompt.includes('warm')) {
+            data.colors = ['#ff6b6b', '#ffa500', '#ffd700', '#ff4757'];
+        } else if (prompt.includes('cool colors') || prompt.includes('cool')) {
+            data.colors = ['#3742fa', '#2f3542', '#40407a', '#706fd3'];
+        } else if (prompt.includes('pastel')) {
+            data.colors = ['#ffeaa7', '#fab1a0', '#fd79a8', '#fdcb6e'];
+        } else if (prompt.includes('vibrant')) {
+            data.colors = ['#e17055', '#0984e3', '#00b894', '#fdcb6e'];
+        } else if (prompt.includes('neon')) {
+            data.colors = ['#00ff00', '#ff00ff', '#00ffff', '#ffff00'];
+        } else if (prompt.includes('monochrome')) {
+            data.colors = ['#2d3436', '#636e72', '#b2bec3', '#ddd'];
+        }
+        
+        // Parse mood
+        if (prompt.includes('dark') || prompt.includes('mysterious')) {
+            data.mood = 'dark';
+            data.colors = data.colors.map(c => this.darkenColor(c));
+        } else if (prompt.includes('bright') || prompt.includes('cheerful')) {
+            data.mood = 'bright';
+            data.colors = data.colors.map(c => this.brightenColor(c));
+        } else if (prompt.includes('dreamy') || prompt.includes('ethereal')) {
+            data.mood = 'dreamy';
+        } else if (prompt.includes('dramatic') || prompt.includes('intense')) {
+            data.mood = 'dramatic';
+        }
+        
+        // Parse complexity
+        const wordCount = prompt.split(' ').length;
+        if (wordCount > 50) data.complexity = 'complex';
+        else if (wordCount < 25) data.complexity = 'simple';
+        
+        // Parse style
+        if (prompt.includes('geometric')) data.style = 'geometric';
+        else if (prompt.includes('organic')) data.style = 'organic';
+        else if (prompt.includes('abstract')) data.style = 'abstract';
+        else if (prompt.includes('pattern')) data.style = 'pattern';
+        
+        return data;
+    }
+    
+    createAbstractArt(data) {
+        const ctx = this.ctx;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Create gradient background
+        this.createGradientBackground(data);
+        
+        // Add layers based on complexity
+        const layers = data.complexity === 'simple' ? 2 : data.complexity === 'complex' ? 6 : 4;
+        
+        for (let i = 0; i < layers; i++) {
+            this.addArtLayer(data, i, layers);
+        }
+        
+        // Add final effects
+        this.addEffects(data);
+    }
+    
+    createGradientBackground(data) {
+        const ctx = this.ctx;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        
+        // Create radial gradient
+        const gradient = ctx.createRadialGradient(
+            width/2, height/2, 0,
+            width/2, height/2, Math.max(width, height)/2
+        );
+        
+        gradient.addColorStop(0, data.colors[0] + '40');
+        gradient.addColorStop(0.5, data.colors[1] + '20');
+        gradient.addColorStop(1, data.colors[2] + '60');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+    }
+    
+    addArtLayer(data, layerIndex, totalLayers) {
+        const ctx = this.ctx;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const opacity = 0.8 - (layerIndex * 0.15);
+        
+        ctx.globalAlpha = opacity;
+        
+        switch (data.style) {
+            case 'geometric':
+                this.drawGeometricShapes(data, layerIndex);
+                break;
+            case 'organic':
+                this.drawOrganicShapes(data, layerIndex);
+                break;
+            case 'pattern':
+                this.drawPatterns(data, layerIndex);
+                break;
+            default:
+                this.drawAbstractShapes(data, layerIndex);
+        }
+        
+        ctx.globalAlpha = 1;
+    }
+    
+    drawGeometricShapes(data, layer) {
+        const ctx = this.ctx;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const shapeCount = 5 + layer * 2;
+        
+        for (let i = 0; i < shapeCount; i++) {
+            const x = Math.random() * width;
+            const y = Math.random() * height;
+            const size = 20 + Math.random() * 100;
+            const color = data.colors[Math.floor(Math.random() * data.colors.length)];
+            
+            ctx.fillStyle = color + Math.floor(50 + Math.random() * 100).toString(16);
+            
+            if (Math.random() > 0.5) {
+                // Rectangle
+                ctx.fillRect(x - size/2, y - size/2, size, size);
+            } else {
+                // Circle
+                ctx.beginPath();
+                ctx.arc(x, y, size/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+    
+    drawOrganicShapes(data, layer) {
+        const ctx = this.ctx;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const shapeCount = 3 + layer;
+        
+        for (let i = 0; i < shapeCount; i++) {
+            const centerX = Math.random() * width;
+            const centerY = Math.random() * height;
+            const color = data.colors[Math.floor(Math.random() * data.colors.length)];
+            
+            ctx.fillStyle = color + Math.floor(30 + Math.random() * 80).toString(16);
+            
+            this.drawBlobShape(centerX, centerY, 50 + Math.random() * 100);
+        }
+    }
+    
+    drawPatterns(data, layer) {
+        const ctx = this.ctx;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const spacing = 40 + layer * 10;
+        
+        const color = data.colors[layer % data.colors.length];
+        ctx.strokeStyle = color + '80';
+        ctx.lineWidth = 2 + Math.random() * 3;
+        
+        // Draw grid pattern
+        for (let x = 0; x < width; x += spacing) {
+            for (let y = 0; y < height; y += spacing) {
+                if (Math.random() > 0.7) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5 + Math.random() * 10, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+    
+    drawAbstractShapes(data, layer) {
+        const ctx = this.ctx;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const shapeCount = 4 + layer * 2;
+        
+        for (let i = 0; i < shapeCount; i++) {
+            const x = Math.random() * width;
+            const y = Math.random() * height;
+            const color = data.colors[Math.floor(Math.random() * data.colors.length)];
+            
+            ctx.fillStyle = color + Math.floor(40 + Math.random() * 120).toString(16);
+            
+            // Random abstract shape
+            const shapeType = Math.floor(Math.random() * 4);
+            
+            switch (shapeType) {
+                case 0:
+                    this.drawWaveShape(x, y, 100 + Math.random() * 100);
+                    break;
+                case 1:
+                    this.drawSpiralShape(x, y, 50 + Math.random() * 80);
+                    break;
+                case 2:
+                    this.drawTriangleShape(x, y, 60 + Math.random() * 100);
+                    break;
+                default:
+                    this.drawBlobShape(x, y, 40 + Math.random() * 120);
+            }
+        }
+    }
+    
+    drawBlobShape(centerX, centerY, size) {
+        const ctx = this.ctx;
+        const points = 8 + Math.floor(Math.random() * 8);
+        const angleStep = (Math.PI * 2) / points;
+        
+        ctx.beginPath();
+        
+        for (let i = 0; i <= points; i++) {
+            const angle = i * angleStep;
+            const radiusVariation = 0.7 + Math.random() * 0.6;
+            const radius = size * radiusVariation;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        
+        ctx.closePath();
+        ctx.fill();
+    }
+    
+    drawWaveShape(x, y, size) {
+        const ctx = this.ctx;
+        
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        
+        for (let i = 0; i <= size; i += 10) {
+            const waveY = y + Math.sin(i * 0.1) * 20;
+            ctx.lineTo(x + i, waveY);
+        }
+        
+        ctx.stroke();
+    }
+    
+    drawSpiralShape(centerX, centerY, size) {
+        const ctx = this.ctx;
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        
+        const maxRadius = size;
+        const steps = 50;
+        
+        for (let i = 0; i <= steps; i++) {
+            const angle = (i / steps) * Math.PI * 4;
+            const radius = (i / steps) * maxRadius;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            ctx.lineTo(x, y);
+        }
+        
+        ctx.stroke();
+    }
+    
+    drawTriangleShape(x, y, size) {
+        const ctx = this.ctx;
+        
+        ctx.beginPath();
+        ctx.moveTo(x, y - size/2);
+        ctx.lineTo(x - size/2, y + size/2);
+        ctx.lineTo(x + size/2, y + size/2);
+        ctx.closePath();
+        ctx.fill();
+    }
+    
+    addEffects(data) {
+        if (data.mood === 'dreamy') {
+            this.addGlowEffect();
+        } else if (data.mood === 'dramatic') {
+            this.addShadowEffect();
+        } else if (data.mood === 'bright') {
+            this.addSparkleEffect(data);
+        }
+    }
+    
+    addGlowEffect() {
+        const ctx = this.ctx;
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 20;
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.3;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+    }
+    
+    addShadowEffect() {
+        const ctx = this.ctx;
+        ctx.shadowColor = '#000000';
+        ctx.shadowBlur = 15;
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.globalAlpha = 0.4;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+    }
+    
+    addSparkleEffect(data) {
+        const ctx = this.ctx;
+        const sparkleCount = 20;
+        
+        ctx.fillStyle = '#ffffff';
+        
+        for (let i = 0; i < sparkleCount; i++) {
+            const x = Math.random() * this.canvas.width;
+            const y = Math.random() * this.canvas.height;
+            const size = 2 + Math.random() * 4;
+            
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    
+    darkenColor(color) {
+        // Simple color darkening
+        const factor = 0.6;
+        return color + Math.floor(255 * factor).toString(16).padStart(2, '0');
+    }
+    
+    brightenColor(color) {
+        // Simple color brightening
+        return color + 'CC';
+    }
+    
+    showLoading() {
+        this.generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 생성 중...';
+        this.generateBtn.disabled = true;
+        this.canvas.parentElement.classList.add('canvas-generating');
+    }
+    
+    hideLoading() {
+        this.generateBtn.innerHTML = '<i class="fas fa-image"></i> 이미지 생성하기';
+        this.generateBtn.disabled = false;
+        this.canvas.parentElement.classList.remove('canvas-generating');
+        this.placeholder.classList.add('hidden');
+    }
+    
+    showImageActions() {
+        this.imageActions.style.display = 'flex';
+    }
+    
+    downloadImage() {
+        const link = document.createElement('a');
+        link.download = `ai-generated-image-${Date.now()}.png`;
+        link.href = this.canvas.toDataURL();
+        link.click();
+        
+        this.promptCreator.showToast('이미지가 다운로드되었습니다!');
+    }
+}
+
+// Initialize Image Generator with Prompt Creator
+document.addEventListener('DOMContentLoaded', () => {
+    const promptCreator = new ImagePromptCreator();
+    const imageGenerator = new ImageGenerator(promptCreator);
+});

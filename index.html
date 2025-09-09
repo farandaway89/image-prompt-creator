@@ -243,6 +243,36 @@
                                 <span class="stat-value" id="complexity">간단</span>
                             </div>
                         </div>
+
+                        <!-- Image Generation Section -->
+                        <div class="image-generation-section">
+                            <div class="image-header">
+                                <h4>✨ AI 이미지 생성</h4>
+                                <button class="btn btn-primary" id="generate-image-btn" disabled>
+                                    <i class="fas fa-image"></i>
+                                    이미지 생성하기
+                                </button>
+                            </div>
+                            
+                            <div class="image-canvas-container">
+                                <canvas id="image-canvas" width="512" height="512"></canvas>
+                                <div class="canvas-placeholder" id="canvas-placeholder">
+                                    <i class="fas fa-paint-brush"></i>
+                                    <p>프롬프트를 생성한 후 '이미지 생성하기'를 클릭하세요</p>
+                                </div>
+                            </div>
+                            
+                            <div class="image-actions" id="image-actions" style="display: none;">
+                                <button class="btn btn-secondary" id="download-image-btn">
+                                    <i class="fas fa-download"></i>
+                                    다운로드
+                                </button>
+                                <button class="btn btn-outline" id="regenerate-btn">
+                                    <i class="fas fa-refresh"></i>
+                                    다시 생성
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </section>
 

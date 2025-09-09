@@ -773,6 +773,131 @@ textarea {
   100% { left: 100%; }
 }
 
+/* Image Generation Section */
+.image-generation-section {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 2px solid rgba(102, 126, 234, 0.1);
+}
+
+.image-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.image-header h4 {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.image-canvas-container {
+  position: relative;
+  width: 100%;
+  max-width: 512px;
+  margin: 0 auto;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  border: 2px solid rgba(102, 126, 234, 0.1);
+  overflow: hidden;
+}
+
+#image-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.canvas-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  padding: var(--spacing-xl);
+  min-height: 300px;
+}
+
+.canvas-placeholder i {
+  font-size: var(--font-size-2xl);
+  color: var(--text-accent);
+  margin-bottom: var(--spacing-sm);
+}
+
+.canvas-placeholder.hidden {
+  display: none;
+}
+
+.image-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
+
+#generate-image-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Canvas Animation */
+.canvas-generating {
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-generating::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+  animation: canvasLoading 2s infinite;
+}
+
+@keyframes canvasLoading {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Responsive adjustments for canvas */
+@media (max-width: 768px) {
+  .image-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  .image-actions {
+    flex-direction: column;
+  }
+  
+  .image-canvas-container {
+    max-width: 100%;
+  }
+  
+  .canvas-placeholder {
+    min-height: 250px;
+    padding: var(--spacing-md);
+  }
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
