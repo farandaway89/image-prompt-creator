@@ -793,45 +793,44 @@ class ImageGenerator {
         return parts[0].trim();
     }
     
-    async testAPI() {
+    async testSimpleAPI() {
         const apiKey = this.apiKeyInput.value.trim();
         if (!apiKey) {
             console.log('❌ No API key for testing');
-            return;
+            return null;
         }
 
-        console.log('🧪 Testing Hugging Face API connectivity...');
+        console.log('🧪 Testing simple API call...');
         
-        const models = [
-            'stabilityai/stable-diffusion-2-1',
-            'runwayml/stable-diffusion-v1-5',
-            'CompVis/stable-diffusion-v1-4'
-        ];
-
-        for (const model of models) {
-            try {
-                console.log(`Testing model: ${model}`);
-                const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({inputs: "test"})
-                });
-                
-                console.log(`✅ ${model}: Status ${response.status}`);
-                if (response.ok) {
-                    console.log(`🎯 Working model found: ${model}`);
-                    return model;
-                }
-            } catch (error) {
-                console.log(`❌ ${model}: ${error.message}`);
+        // Try the most reliable model
+        const model = 'black-forest-labs/FLUX.1-dev';
+        
+        try {
+            const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    inputs: "a beautiful cat"
+                })
+            });
+            
+            console.log(`🎯 API Response: ${response.status}`);
+            
+            if (response.ok) {
+                console.log('✅ API working!');
+                return model;
+            } else {
+                const errorText = await response.text();
+                console.log('❌ API Error:', errorText);
+                return null;
             }
+            
+        } catch (error) {
+            console.log('❌ Network Error:', error.message);
+            return null;
         }
-        
-        console.log('❌ No working models found');
-        return null;
     }
 
     async generateWithHuggingFace(prompt) {
@@ -846,36 +845,24 @@ class ImageGenerator {
                 return false;
             }
 
-            // Test API first
-            const workingModel = await this.testAPI();
+            // Test simple API first
+            const workingModel = await this.testSimpleAPI();
             if (!workingModel) {
-                this.promptCreator.showToast('사용 가능한 모델이 없습니다. Canvas 생성을 사용합니다.', 'info');
+                this.promptCreator.showToast('API 연결 실패. Canvas 생성을 사용합니다.', 'info');
                 return false;
             }
             
-            const model = workingModel;
+            console.log('✅ Using working model:', workingModel);
+            this.promptCreator.showToast('🎨 AI 이미지 생성 중...', 'info');
             
-            const headers = {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json',
-                'User-Agent': 'AI-Image-Generator/1.0'
-            };
-            
-            console.log('Using provided API key for model:', model);
-            this.promptCreator.showToast('AI 이미지 생성 중...', 'info');
-            
-            const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+            // Make the simplest possible request
+            const response = await fetch(`https://api-inference.huggingface.co/models/${workingModel}`, {
                 method: 'POST',
-                headers: headers,
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`
+                },
                 body: JSON.stringify({
-                    inputs: prompt,
-                    parameters: {
-                        num_inference_steps: 20,
-                        guidance_scale: 7.5
-                    },
-                    options: {
-                        wait_for_model: true
-                    }
+                    inputs: prompt
                 })
             });
             
@@ -1355,4 +1342,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // Single initialization point to avoid conflicts
     window.promptCreator = new ImagePromptCreator();
     window.imageGenerator = new ImageGenerator(window.promptCreator);
+    
+    // Debug function for direct API testing
+    window.testHuggingFaceAPI = async (apiKey, prompt = "a cat") => {
+        console.log('🔍 Direct API Test Starting...');
+        try {
+            const response = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ inputs: prompt })
+            });
+            
+            console.log('📊 Response Status:', response.status);
+            console.log('📋 Response Headers:', Object.fromEntries(response.headers.entries()));
+            
+            if (response.ok) {
+                console.log('✅ API Test SUCCESS!');
+                const blob = await response.blob();
+                console.log('📦 Received blob size:', blob.size, 'bytes');
+                return true;
+            } else {
+                const errorText = await response.text();
+                console.log('❌ API Test FAILED:', errorText);
+                return false;
+            }
+        } catch (error) {
+            console.log('💥 Network Error:', error);
+            return false;
+        }
+    };
+    
+    console.log('💡 Debug: Type "testHuggingFaceAPI(\'your_api_key\')" in console to test API directly');
 });
