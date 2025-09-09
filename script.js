@@ -41,7 +41,7 @@ class ImagePromptCreator {
             
             // Other
             advancedContent: document.getElementById('advanced-content'),
-            themeToggle: document.getElementById('theme-toggle'),
+            languageToggle: document.getElementById('language-toggle'),
             helpBtn: document.getElementById('help-btn'),
             helpModal: document.getElementById('help-modal'),
             closeHelp: document.getElementById('close-help'),
@@ -52,9 +52,11 @@ class ImagePromptCreator {
 
         this.history = JSON.parse(localStorage.getItem('promptHistory') || '[]');
         this.currentPrompt = '';
+        this.isEnglishMode = localStorage.getItem('languageMode') === 'EN';
         
         // Character counters
         this.setupCharCounters();
+        this.initializeLanguage();
     }
 
     setupEventListeners() {
@@ -71,8 +73,8 @@ class ImagePromptCreator {
         this.elements.saveBtn.addEventListener('click', () => this.savePrompt());
         this.elements.shareBtn.addEventListener('click', () => this.sharePrompt());
         
-        // Theme and help
-        this.elements.themeToggle.addEventListener('click', () => this.toggleTheme());
+        // Language and help
+        this.elements.languageToggle.addEventListener('click', () => this.toggleLanguage());
         this.elements.helpBtn.addEventListener('click', () => this.showHelp());
         this.elements.closeHelp.addEventListener('click', () => this.hideHelp());
         
@@ -609,15 +611,31 @@ class ImagePromptCreator {
         this.generatePrompt();
     }
 
-    toggleTheme() {
-        document.body.classList.toggle('dark-theme');
-        const isDark = document.body.classList.contains('dark-theme');
+    toggleLanguage() {
+        this.isEnglishMode = !this.isEnglishMode;
+        localStorage.setItem('languageMode', this.isEnglishMode ? 'EN' : 'KO');
         
-        this.elements.themeToggle.innerHTML = isDark ? 
-            '<i class="fas fa-sun"></i>' : 
-            '<i class="fas fa-moon"></i>';
-            
-        localStorage.setItem('darkTheme', isDark);
+        const langIndicator = this.elements.languageToggle.querySelector('.lang-indicator');
+        langIndicator.textContent = this.isEnglishMode ? 'EN' : 'KO';
+        
+        if (this.isEnglishMode) {
+            this.elements.languageToggle.classList.add('active');
+            this.elements.languageToggle.title = 'English ↔ Korean prompts (Currently: English)';
+        } else {
+            this.elements.languageToggle.classList.remove('active');
+            this.elements.languageToggle.title = '한국어 ↔ 영어 프롬프트 (현재: 한국어)';
+        }
+        
+        this.showToast(
+            this.isEnglishMode ? 
+            'English mode enabled (better for AI)' : 
+            '한국어 모드 활성화됨', 
+            'info'
+        );
+        
+        // Clear current prompt to avoid confusion
+        this.elements.basicIdea.value = '';
+        this.updateCharCounters();
     }
 
     showHelp() {

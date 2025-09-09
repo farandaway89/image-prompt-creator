@@ -162,24 +162,45 @@ body::before {
   gap: var(--spacing-sm);
 }
 
-.theme-toggle, .help-btn {
+.language-toggle, .help-btn {
   width: 48px;
   height: 48px;
   border: none;
   border-radius: 50%;
   background: var(--bg-card);
   color: var(--text-accent);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-sm);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
 }
 
-.theme-toggle:hover, .help-btn:hover {
+.language-toggle:hover, .help-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   background: var(--primary-gradient);
   color: var(--text-white);
+}
+
+.lang-indicator {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.language-toggle.active {
+  background: var(--success-gradient);
+  color: var(--text-white);
+}
+
+.help-btn {
+  font-size: var(--font-size-lg);
 }
 
 /* Main Content */
