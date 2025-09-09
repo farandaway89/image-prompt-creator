@@ -346,7 +346,9 @@ class ImagePromptCreator {
         // Trigger change events for character counters
         this.elements.basicIdea.dispatchEvent(new Event('input'));
         
-        this.showToast('랜덤 설정이 적용되었습니다!');
+        this.showToast(
+            this.isEnglishMode ? 'Random settings applied!' : '랜덤 설정이 적용되었습니다!'
+        );
         this.generatePrompt();
     }
 
@@ -372,12 +374,14 @@ class ImagePromptCreator {
         this.elements.resultContent.innerHTML = `
             <div class="placeholder">
                 <i class="fas fa-lightbulb"></i>
-                <p>옵션을 선택하고 '프롬프트 생성하기' 버튼을 눌러주세요!</p>
+                <p>${this.isEnglishMode ? "Select options and click 'Generate Prompt' button!" : "옵션을 선택하고 '프롬프트 생성하기' 버튼을 눌러주세요!"}</p>
             </div>
         `;
         
         this.updateStats('');
-        this.showToast('폼이 초기화되었습니다.');
+        this.showToast(
+            this.isEnglishMode ? 'Form cleared.' : '폼이 초기화되었습니다.'
+        );
     }
 
     toggleAdvanced() {
@@ -420,10 +424,10 @@ class ImagePromptCreator {
     updateStats(prompt) {
         const words = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
         const chars = prompt.length;
-        let complexity = '간단';
+        let complexity = this.isEnglishMode ? 'Simple' : '간단';
         
-        if (words > 50) complexity = '복잡';
-        else if (words > 25) complexity = '보통';
+        if (words > 50) complexity = this.isEnglishMode ? 'Complex' : '복잡';
+        else if (words > 25) complexity = this.isEnglishMode ? 'Medium' : '보통';
         
         this.elements.wordCount.textContent = words;
         this.elements.charCount.textContent = chars;
@@ -431,25 +435,34 @@ class ImagePromptCreator {
     }
 
     showLoading() {
-        this.elements.generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 생성 중...';
+        this.elements.generateBtn.innerHTML = this.isEnglishMode ? 
+            '<i class="fas fa-spinner fa-spin"></i> Generating...' : 
+            '<i class="fas fa-spinner fa-spin"></i> 생성 중...';
         this.elements.generateBtn.disabled = true;
         this.elements.resultContent.classList.add('loading');
     }
 
     hideLoading() {
-        this.elements.generateBtn.innerHTML = '<i class="fas fa-magic"></i> 프롬프트 생성하기';
+        this.elements.generateBtn.innerHTML = this.isEnglishMode ? 
+            '<i class="fas fa-magic"></i> Generate Prompt' : 
+            '<i class="fas fa-magic"></i> 프롬프트 생성하기';
         this.elements.generateBtn.disabled = false;
         this.elements.resultContent.classList.remove('loading');
     }
 
     copyPrompt() {
         if (!this.currentPrompt) {
-            this.showToast('복사할 프롬프트가 없습니다.', 'error');
+            this.showToast(
+                this.isEnglishMode ? 'No prompt to copy.' : '복사할 프롬프트가 없습니다.', 
+                'error'
+            );
             return;
         }
 
         navigator.clipboard.writeText(this.currentPrompt).then(() => {
-            this.showToast('프롬프트가 클립보드에 복사되었습니다!');
+            this.showToast(
+                this.isEnglishMode ? 'Prompt copied to clipboard!' : '프롬프트가 클립보드에 복사되었습니다!'
+            );
         }).catch(() => {
             // Fallback for older browsers
             const textArea = document.createElement('textarea');
@@ -458,13 +471,18 @@ class ImagePromptCreator {
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            this.showToast('프롬프트가 복사되었습니다!');
+            this.showToast(
+                this.isEnglishMode ? 'Prompt copied!' : '프롬프트가 복사되었습니다!'
+            );
         });
     }
 
     savePrompt() {
         if (!this.currentPrompt) {
-            this.showToast('저장할 프롬프트가 없습니다.', 'error');
+            this.showToast(
+                this.isEnglishMode ? 'No prompt to save.' : '저장할 프롬프트가 없습니다.', 
+                'error'
+            );
             return;
         }
 
@@ -478,23 +496,32 @@ class ImagePromptCreator {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        this.showToast('프롬프트가 파일로 저장되었습니다!');
+        this.showToast(
+            this.isEnglishMode ? 'Prompt saved as file!' : '프롬프트가 파일로 저장되었습니다!'
+        );
     }
 
     sharePrompt() {
         if (!this.currentPrompt) {
-            this.showToast('공유할 프롬프트가 없습니다.', 'error');
+            this.showToast(
+                this.isEnglishMode ? 'No prompt to share.' : '공유할 프롬프트가 없습니다.', 
+                'error'
+            );
             return;
         }
 
         if (navigator.share) {
             navigator.share({
-                title: 'AI 이미지 프롬프트',
+                title: this.isEnglishMode ? 'AI Image Prompt' : 'AI 이미지 프롬프트',
                 text: this.currentPrompt
             });
         } else {
             this.copyPrompt();
-            this.showToast('프롬프트가 클립보드에 복사되었습니다. 원하는 곳에 붙여넣기 하세요!');
+            this.showToast(
+                this.isEnglishMode ? 
+                'Prompt copied to clipboard. Paste it anywhere!' : 
+                '프롬프트가 클립보드에 복사되었습니다. 원하는 곳에 붙여넣기 하세요!'
+            );
         }
     }
 
@@ -525,7 +552,7 @@ class ImagePromptCreator {
             this.elements.historyList.innerHTML = `
                 <div class="history-empty">
                     <i class="fas fa-history"></i>
-                    <p>생성 기록이 없습니다</p>
+                    <p>${this.isEnglishMode ? 'No generation history' : '생성 기록이 없습니다'}</p>
                 </div>
             `;
             return;
@@ -560,7 +587,9 @@ class ImagePromptCreator {
         this.elements.historyList.querySelectorAll('.history-copy').forEach((btn, index) => {
             btn.addEventListener('click', () => {
                 navigator.clipboard.writeText(this.history[index].fullPrompt);
-                this.showToast('프롬프트가 복사되었습니다!');
+                this.showToast(
+                    this.isEnglishMode ? 'Prompt copied!' : '프롬프트가 복사되었습니다!'
+                );
             });
         });
     }
@@ -569,7 +598,9 @@ class ImagePromptCreator {
         this.history = [];
         localStorage.removeItem('promptHistory');
         this.renderHistory();
-        this.showToast('기록이 삭제되었습니다.');
+        this.showToast(
+            this.isEnglishMode ? 'History cleared.' : '기록이 삭제되었습니다.'
+        );
     }
 
     setupTemplates() {
@@ -642,7 +673,9 @@ class ImagePromptCreator {
         // Trigger change events
         this.elements.basicIdea.dispatchEvent(new Event('input'));
         
-        this.showToast(`${templateName} 템플릿이 적용되었습니다!`);
+        this.showToast(
+            this.isEnglishMode ? `${templateName} template applied!` : `${templateName} 템플릿이 적용되었습니다!`
+        );
         this.generatePrompt();
     }
 
@@ -909,6 +942,270 @@ class ImagePromptCreator {
             'Medium': t.medium,
             'Complex': t.complex
         };
+
+        // Update result placeholder
+        const placeholder = document.querySelector('.placeholder p');
+        if (placeholder) {
+            placeholder.textContent = this.isEnglishMode ? 
+                "Select options and click 'Generate Prompt' button!" : 
+                "옵션을 선택하고 '프롬프트 생성하기' 버튼을 눌러주세요!";
+        }
+
+        // Update image generation section
+        const imageGenTitle = document.querySelector('.image-generation h3');
+        if (imageGenTitle) {
+            imageGenTitle.textContent = this.isEnglishMode ? '✨ AI Image Generation' : '✨ AI 이미지 생성';
+        }
+
+        const imageInstructions = document.querySelector('.canvas-placeholder p');
+        if (imageInstructions) {
+            imageInstructions.textContent = this.isEnglishMode ? 
+                "Generate a prompt first, then click 'Generate Image'" : 
+                "프롬프트를 생성한 후 '이미지 생성하기'를 클릭하세요";
+        }
+
+        // Update template section
+        const templateTitle = document.querySelector('.templates h3');
+        if (templateTitle) {
+            templateTitle.textContent = this.isEnglishMode ? 'Preset Templates' : '프리셋 템플릿';
+        }
+
+        // Update template cards
+        const templateCards = document.querySelectorAll('.template-card');
+        const templateTranslations = {
+            portrait: {
+                ko: { title: '인물 사진', desc: '사실적인 인물 사진 생성용' },
+                en: { title: 'Portrait', desc: 'For realistic portrait generation' }
+            },
+            landscape: {
+                ko: { title: '풍경 사진', desc: '아름다운 자연 풍경 생성용' },
+                en: { title: 'Landscape', desc: 'For beautiful nature scenes' }
+            },
+            fantasy: {
+                ko: { title: '판타지', desc: '판타지 아트워크 생성용' },
+                en: { title: 'Fantasy', desc: 'For fantasy artwork generation' }
+            },
+            scifi: {
+                ko: { title: '공상과학', desc: '미래적 SF 이미지 생성용' },
+                en: { title: 'Sci-Fi', desc: 'For futuristic SF images' }
+            },
+            anime: {
+                ko: { title: '애니메이션', desc: '애니메이션 스타일 생성용' },
+                en: { title: 'Animation', desc: 'For animation style generation' }
+            },
+            abstract: {
+                ko: { title: '추상 미술', desc: '추상적 아트워크 생성용' },
+                en: { title: 'Abstract Art', desc: 'For abstract artwork generation' }
+            }
+        };
+
+        templateCards.forEach(card => {
+            const template = card.dataset.template;
+            const titleEl = card.querySelector('h4');
+            const descEl = card.querySelector('p');
+            
+            if (template && templateTranslations[template]) {
+                const trans = templateTranslations[template][lang];
+                if (titleEl && trans) titleEl.textContent = trans.title;
+                if (descEl && trans) descEl.textContent = trans.desc;
+            }
+        });
+
+        // Update dropdown options
+        this.updateDropdownOptions();
+    }
+
+    updateDropdownOptions() {
+        const optionTranslations = {
+            imageStyle: {
+                ko: {
+                    '': '선택하세요',
+                    'photorealistic': '사실적',
+                    'anime': '애니메이션',
+                    'digital-art': '디지털 아트',
+                    'oil-painting': '유화',
+                    'watercolor': '수채화',
+                    'sketch': '스케치',
+                    '3d-render': '3D 렌더',
+                    'pixel-art': '픽셀 아트',
+                    'comic': '만화',
+                    'vintage': '빈티지'
+                },
+                en: {
+                    '': 'Select style',
+                    'photorealistic': 'Photorealistic',
+                    'anime': 'Anime',
+                    'digital-art': 'Digital Art',
+                    'oil-painting': 'Oil Painting',
+                    'watercolor': 'Watercolor',
+                    'sketch': 'Sketch',
+                    '3d-render': '3D Render',
+                    'pixel-art': 'Pixel Art',
+                    'comic': 'Comic',
+                    'vintage': 'Vintage'
+                }
+            },
+            mood: {
+                ko: {
+                    '': '선택하세요',
+                    'bright-cheerful': '밝고 쾌활한',
+                    'dark-mysterious': '어둡고 신비한',
+                    'calm-peaceful': '차분하고 평화로운',
+                    'dramatic-intense': '극적이고 강렬한',
+                    'dreamy-ethereal': '꿈같고 환상적인',
+                    'nostalgic': '향수를 자아내는',
+                    'futuristic': '미래적인',
+                    'romantic': '로맨틱한',
+                    'scary-horror': '무섭고 공포스러운'
+                },
+                en: {
+                    '': 'Select mood',
+                    'bright-cheerful': 'Bright & Cheerful',
+                    'dark-mysterious': 'Dark & Mysterious',
+                    'calm-peaceful': 'Calm & Peaceful',
+                    'dramatic-intense': 'Dramatic & Intense',
+                    'dreamy-ethereal': 'Dreamy & Ethereal',
+                    'nostalgic': 'Nostalgic',
+                    'futuristic': 'Futuristic',
+                    'romantic': 'Romantic',
+                    'scary-horror': 'Scary & Horror'
+                }
+            },
+            colorPalette: {
+                ko: {
+                    '': '선택하세요',
+                    'warm': '따뜻한 색상',
+                    'cool': '차가운 색상',
+                    'monochrome': '흑백',
+                    'pastel': '파스텔',
+                    'vibrant': '생동감 있는',
+                    'earth-tones': '자연색',
+                    'neon': '네온',
+                    'sunset': '석양',
+                    'ocean': '바다'
+                },
+                en: {
+                    '': 'Select palette',
+                    'warm': 'Warm Colors',
+                    'cool': 'Cool Colors',
+                    'monochrome': 'Monochrome',
+                    'pastel': 'Pastel',
+                    'vibrant': 'Vibrant',
+                    'earth-tones': 'Earth Tones',
+                    'neon': 'Neon',
+                    'sunset': 'Sunset',
+                    'ocean': 'Ocean'
+                }
+            },
+            composition: {
+                ko: {
+                    '': '선택하세요',
+                    'close-up': '클로즈업',
+                    'medium-shot': '중간샷',
+                    'wide-shot': '와이드샷',
+                    'birds-eye': '조감도',
+                    'low-angle': '로우앵글',
+                    'high-angle': '하이앵글',
+                    'first-person': '1인칭 시점',
+                    'panoramic': '파노라마'
+                },
+                en: {
+                    '': 'Select composition',
+                    'close-up': 'Close-up',
+                    'medium-shot': 'Medium Shot',
+                    'wide-shot': 'Wide Shot',
+                    'birds-eye': 'Bird\'s Eye View',
+                    'low-angle': 'Low Angle',
+                    'high-angle': 'High Angle',
+                    'first-person': 'First Person',
+                    'panoramic': 'Panoramic'
+                }
+            },
+            timeOfDay: {
+                ko: {
+                    '': '선택하세요',
+                    'dawn': '새벽',
+                    'morning': '아침',
+                    'noon': '정오',
+                    'afternoon': '오후',
+                    'sunset': '석양',
+                    'dusk': '황혼',
+                    'night': '밤',
+                    'midnight': '자정'
+                },
+                en: {
+                    '': 'Select time',
+                    'dawn': 'Dawn',
+                    'morning': 'Morning',
+                    'noon': 'Noon',
+                    'afternoon': 'Afternoon',
+                    'sunset': 'Sunset',
+                    'dusk': 'Dusk',
+                    'night': 'Night',
+                    'midnight': 'Midnight'
+                }
+            },
+            quality: {
+                ko: {
+                    '': '선택하세요',
+                    'ultra-detailed': '초고해상도',
+                    'high-quality': '고품질',
+                    '8k': '8K 해상도',
+                    '4k': '4K 해상도',
+                    'hd': 'HD 품질',
+                    'masterpiece': '걸작품질'
+                },
+                en: {
+                    '': 'Select quality',
+                    'ultra-detailed': 'Ultra Detailed',
+                    'high-quality': 'High Quality',
+                    '8k': '8K Resolution',
+                    '4k': '4K Resolution',
+                    'hd': 'HD Quality',
+                    'masterpiece': 'Masterpiece'
+                }
+            },
+            artistStyle: {
+                ko: {
+                    '': '선택하세요',
+                    'van-gogh': '반 고흐',
+                    'picasso': '피카소',
+                    'monet': '모네',
+                    'da-vinci': '레오나르도 다 빈치',
+                    'banksy': '뱅크시',
+                    'studio-ghibli': '스튜디오 지브리',
+                    'disney': '디즈니',
+                    'cyberpunk': '사이버펑크'
+                },
+                en: {
+                    '': 'Select artist',
+                    'van-gogh': 'Van Gogh',
+                    'picasso': 'Picasso',
+                    'monet': 'Monet',
+                    'da-vinci': 'Da Vinci',
+                    'banksy': 'Banksy',
+                    'studio-ghibli': 'Studio Ghibli',
+                    'disney': 'Disney',
+                    'cyberpunk': 'Cyberpunk'
+                }
+            }
+        };
+
+        const lang = this.isEnglishMode ? 'en' : 'ko';
+        
+        Object.keys(optionTranslations).forEach(selectId => {
+            const select = document.getElementById(selectId.replace(/([A-Z])/g, '-$1').toLowerCase());
+            if (select) {
+                const options = select.querySelectorAll('option');
+                options.forEach(option => {
+                    const value = option.value;
+                    const translations = optionTranslations[selectId][lang];
+                    if (translations && translations[value]) {
+                        option.textContent = translations[value];
+                    }
+                });
+            }
+        });
     }
 
     showHelp() {
