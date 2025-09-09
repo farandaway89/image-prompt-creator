@@ -70,6 +70,9 @@ class ImagePromptCreator {
             this.elements.languageToggle.classList.remove('active');
             this.elements.languageToggle.title = '한국어 ↔ 영어 프롬프트 (현재: 한국어)';
         }
+        
+        // Apply language settings on page load
+        this.updateUILanguage();
     }
     
     updateCharCounters() {
@@ -658,6 +661,9 @@ class ImagePromptCreator {
             this.elements.languageToggle.title = '한국어 ↔ 영어 프롬프트 (현재: 한국어)';
         }
         
+        // Update all UI text based on language
+        this.updateUILanguage();
+        
         this.showToast(
             this.isEnglishMode ? 
             'English mode enabled (better for AI)' : 
@@ -668,6 +674,241 @@ class ImagePromptCreator {
         // Clear current prompt to avoid confusion
         this.elements.basicIdea.value = '';
         this.updateCharCounters();
+    }
+
+    updateUILanguage() {
+        const translations = {
+            ko: {
+                // Header
+                appTitle: 'Image Prompt Creator',
+                heroTitle: 'AI 이미지 프롬프트 생성기',
+                heroSubtitle: '창의적이고 구체적인 AI 이미지 생성 프롬프트를 자동으로 만들어보세요',
+                
+                // Form labels
+                basicIdea: '기본 아이디어',
+                basicIdeaPlaceholder: '예: 아름다운 여성의 초상화, 미래 도시 풍경 등',
+                imageStyle: '이미지 스타일',
+                mood: '분위기',
+                colorPalette: '색상 팔레트',
+                composition: '구도',
+                timeOfDay: '시간대',
+                quality: '품질',
+                additionalDetails: '추가 세부사항',
+                additionalDetailsPlaceholder: '추가하고 싶은 세부 요소나 특징을 입력하세요',
+                excludeElements: '제외할 요소',
+                excludePlaceholder: '이미지에서 제외하고 싶은 요소들을 입력하세요',
+                artistStyle: '아티스트 스타일',
+                
+                // Buttons
+                generateBtn: '프롬프트 생성하기',
+                randomBtn: '랜덤 생성',
+                clearBtn: '초기화',
+                advancedOptions: '고급 옵션',
+                
+                // Actions
+                copyBtn: '복사',
+                saveBtn: '저장',
+                shareBtn: '공유',
+                
+                // Image generation
+                generateImageBtn: '이미지 생성하기',
+                downloadImageBtn: '이미지 다운로드',
+                regenerateBtn: '재생성',
+                apiKeyLabel: 'Hugging Face API 키',
+                apiKeyPlaceholder: 'hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                apiKeyHint: '키는 자동으로 저장됩니다',
+                
+                // Results
+                resultTitle: '생성된 프롬프트',
+                statsTitle: '통계',
+                wordCount: '단어',
+                charCount: '글자',
+                complexity: '복잡도',
+                
+                // History
+                historyTitle: '생성 기록',
+                clearHistoryBtn: '기록 삭제',
+                
+                // Complexity levels
+                simple: '간단',
+                medium: '보통',
+                complex: '복잡'
+            },
+            en: {
+                // Header
+                appTitle: 'Image Prompt Creator',
+                heroTitle: 'AI Image Prompt Generator',
+                heroSubtitle: 'Automatically create creative and detailed AI image generation prompts',
+                
+                // Form labels
+                basicIdea: 'Basic Idea',
+                basicIdeaPlaceholder: 'e.g., Beautiful woman portrait, futuristic cityscape, etc.',
+                imageStyle: 'Image Style',
+                mood: 'Mood',
+                colorPalette: 'Color Palette',
+                composition: 'Composition',
+                timeOfDay: 'Time of Day',
+                quality: 'Quality',
+                additionalDetails: 'Additional Details',
+                additionalDetailsPlaceholder: 'Enter additional elements or features you want to include',
+                excludeElements: 'Exclude Elements',
+                excludePlaceholder: 'Enter elements you want to exclude from the image',
+                artistStyle: 'Artist Style',
+                
+                // Buttons
+                generateBtn: 'Generate Prompt',
+                randomBtn: 'Random Generate',
+                clearBtn: 'Clear',
+                advancedOptions: 'Advanced Options',
+                
+                // Actions
+                copyBtn: 'Copy',
+                saveBtn: 'Save',
+                shareBtn: 'Share',
+                
+                // Image generation
+                generateImageBtn: 'Generate Image',
+                downloadImageBtn: 'Download Image',
+                regenerateBtn: 'Regenerate',
+                apiKeyLabel: 'Hugging Face API Key',
+                apiKeyPlaceholder: 'hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                apiKeyHint: 'Key will be saved automatically',
+                
+                // Results
+                resultTitle: 'Generated Prompt',
+                statsTitle: 'Statistics',
+                wordCount: 'Words',
+                charCount: 'Characters',
+                complexity: 'Complexity',
+                
+                // History
+                historyTitle: 'Generation History',
+                clearHistoryBtn: 'Clear History',
+                
+                // Complexity levels
+                simple: 'Simple',
+                medium: 'Medium',
+                complex: 'Complex'
+            }
+        };
+
+        const lang = this.isEnglishMode ? 'en' : 'ko';
+        const t = translations[lang];
+
+        // Update hero section
+        const heroTitle = document.querySelector('.hero-content h2');
+        const heroSubtitle = document.querySelector('.hero-content p');
+        if (heroTitle) heroTitle.textContent = t.heroTitle;
+        if (heroSubtitle) heroSubtitle.textContent = t.heroSubtitle;
+
+        // Update form labels
+        const updateLabel = (id, text) => {
+            const label = document.querySelector(`label[for="${id}"]`);
+            if (label) {
+                const required = label.querySelector('.required');
+                label.innerHTML = text + (required ? ' <span class="required">*</span>' : '');
+            }
+        };
+
+        updateLabel('basic-idea', t.basicIdea);
+        updateLabel('image-style', t.imageStyle);
+        updateLabel('mood', t.mood);
+        updateLabel('color-palette', t.colorPalette);
+        updateLabel('composition', t.composition);
+        updateLabel('time-of-day', t.timeOfDay);
+        updateLabel('quality', t.quality);
+        updateLabel('additional-details', t.additionalDetails);
+        updateLabel('exclude-elements', t.excludeElements);
+        updateLabel('artist-style', t.artistStyle);
+        updateLabel('api-key-input', t.apiKeyLabel);
+
+        // Update placeholders
+        if (this.elements.basicIdea) this.elements.basicIdea.placeholder = t.basicIdeaPlaceholder;
+        if (this.elements.additionalDetails) this.elements.additionalDetails.placeholder = t.additionalDetailsPlaceholder;
+        if (this.elements.excludeElements) this.elements.excludeElements.placeholder = t.excludePlaceholder;
+        const apiKeyInput = document.getElementById('api-key-input');
+        if (apiKeyInput) apiKeyInput.placeholder = t.apiKeyPlaceholder;
+
+        // Update buttons
+        if (this.elements.generateBtn) {
+            this.elements.generateBtn.innerHTML = `<i class="fas fa-magic"></i> ${t.generateBtn}`;
+        }
+        if (this.elements.randomBtn) {
+            this.elements.randomBtn.innerHTML = `<i class="fas fa-dice"></i> ${t.randomBtn}`;
+        }
+        if (this.elements.clearBtn) {
+            this.elements.clearBtn.innerHTML = `<i class="fas fa-eraser"></i> ${t.clearBtn}`;
+        }
+
+        // Update advanced options
+        const advancedToggle = document.getElementById('advanced-toggle');
+        if (advancedToggle) {
+            advancedToggle.innerHTML = `<i class="fas fa-cog"></i> ${t.advancedOptions} <i class="fas fa-chevron-down"></i>`;
+        }
+
+        // Update action buttons
+        if (this.elements.copyBtn) {
+            this.elements.copyBtn.innerHTML = `<i class="fas fa-copy"></i> ${t.copyBtn}`;
+        }
+        if (this.elements.saveBtn) {
+            this.elements.saveBtn.innerHTML = `<i class="fas fa-download"></i> ${t.saveBtn}`;
+        }
+        if (this.elements.shareBtn) {
+            this.elements.shareBtn.innerHTML = `<i class="fas fa-share"></i> ${t.shareBtn}`;
+        }
+
+        // Update image generation buttons
+        const generateImageBtn = document.getElementById('generate-image-btn');
+        const downloadImageBtn = document.getElementById('download-image-btn');
+        const regenerateBtn = document.getElementById('regenerate-btn');
+        
+        if (generateImageBtn) {
+            generateImageBtn.innerHTML = `<i class="fas fa-image"></i> ${t.generateImageBtn}`;
+        }
+        if (downloadImageBtn) {
+            downloadImageBtn.innerHTML = `<i class="fas fa-download"></i> ${t.downloadImageBtn}`;
+        }
+        if (regenerateBtn) {
+            regenerateBtn.innerHTML = `<i class="fas fa-redo"></i> ${t.regenerateBtn}`;
+        }
+
+        // Update API key hint
+        const apiKeyHint = document.querySelector('.api-key-hint');
+        if (apiKeyHint) apiKeyHint.textContent = t.apiKeyHint;
+
+        // Update result section titles
+        const resultTitle = document.querySelector('.result-title');
+        if (resultTitle) resultTitle.textContent = t.resultTitle;
+
+        const statsTitle = document.querySelector('.stats h3');
+        if (statsTitle) statsTitle.textContent = t.statsTitle;
+
+        // Update stats labels
+        const wordCountLabel = document.querySelector('.stat-item:nth-child(1) .stat-label');
+        const charCountLabel = document.querySelector('.stat-item:nth-child(2) .stat-label');
+        const complexityLabel = document.querySelector('.stat-item:nth-child(3) .stat-label');
+        
+        if (wordCountLabel) wordCountLabel.textContent = t.wordCount;
+        if (charCountLabel) charCountLabel.textContent = t.charCount;
+        if (complexityLabel) complexityLabel.textContent = t.complexity;
+
+        // Update history section
+        const historyTitle = document.querySelector('.history h3');
+        if (historyTitle) historyTitle.textContent = t.historyTitle;
+        
+        if (this.elements.clearHistory) {
+            this.elements.clearHistory.innerHTML = `<i class="fas fa-trash"></i> ${t.clearHistoryBtn}`;
+        }
+
+        // Update complexity display in stats if needed
+        this.complexityTranslations = {
+            '간단': t.simple,
+            '보통': t.medium, 
+            '복잡': t.complex,
+            'Simple': t.simple,
+            'Medium': t.medium,
+            'Complex': t.complex
+        };
     }
 
     showHelp() {
