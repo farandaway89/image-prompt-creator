@@ -719,7 +719,7 @@ class ImagePromptCreator {
                 
                 // Form labels
                 basicIdea: '기본 아이디어',
-                basicIdeaPlaceholder: '예: 아름다운 여성의 초상화, 미래 도시 풍경 등',
+                basicIdeaPlaceholder: '예: 고양이, 판타지 성, 우주 정거장...',
                 imageStyle: '이미지 스타일',
                 mood: '분위기',
                 colorPalette: '색상 팔레트',
@@ -775,7 +775,7 @@ class ImagePromptCreator {
                 
                 // Form labels
                 basicIdea: 'Basic Idea',
-                basicIdeaPlaceholder: 'e.g., Beautiful woman portrait, futuristic cityscape, etc.',
+                basicIdeaPlaceholder: 'e.g., cat, fantasy castle, space station...',
                 imageStyle: 'Image Style',
                 mood: 'Mood',
                 colorPalette: 'Color Palette',
@@ -1013,6 +1013,62 @@ class ImagePromptCreator {
 
         // Update dropdown options
         this.updateDropdownOptions();
+
+        // Update HTML labels that are not handled by updateLabel function
+        const htmlLabels = {
+            ko: {
+                'option-group-image-style': '이미지 스타일',
+                'option-group-mood': '분위기/무드', 
+                'option-group-color-palette': '색상 팔레트',
+                'option-group-composition': '구도/시점',
+                'option-group-time-of-day': '시간대',
+                'option-group-quality': '품질 설정'
+            },
+            en: {
+                'option-group-image-style': 'Image Style',
+                'option-group-mood': 'Mood/Atmosphere',
+                'option-group-color-palette': 'Color Palette', 
+                'option-group-composition': 'Composition',
+                'option-group-time-of-day': 'Time of Day',
+                'option-group-quality': 'Quality Settings'
+            }
+        };
+
+        const labelTexts = htmlLabels[lang];
+        
+        // Update option group labels
+        const optionGroups = document.querySelectorAll('.option-group');
+        optionGroups.forEach((group, index) => {
+            const label = group.querySelector('label');
+            if (label) {
+                const selectId = group.querySelector('select')?.id;
+                let key = '';
+                
+                if (selectId === 'image-style') key = 'option-group-image-style';
+                else if (selectId === 'mood') key = 'option-group-mood';
+                else if (selectId === 'color-palette') key = 'option-group-color-palette';
+                else if (selectId === 'composition') key = 'option-group-composition';
+                else if (selectId === 'time-of-day') key = 'option-group-time-of-day';
+                else if (selectId === 'quality') key = 'option-group-quality';
+                
+                if (key && labelTexts[key]) {
+                    label.textContent = labelTexts[key];
+                }
+            }
+        });
+
+        // Update character counter labels (e.g., "0/200" -> stays same but context changes)
+        const charCounters = document.querySelectorAll('.char-counter');
+        // Character counters stay numeric so no translation needed
+        
+        // Update stats complexity display if there's already a value
+        const complexityEl = this.elements.complexity;
+        if (complexityEl && this.complexityTranslations) {
+            const currentText = complexityEl.textContent;
+            if (this.complexityTranslations[currentText]) {
+                complexityEl.textContent = this.complexityTranslations[currentText];
+            }
+        }
     }
 
     updateDropdownOptions() {
