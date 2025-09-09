@@ -285,16 +285,16 @@ class ImagePromptCreator {
         };
 
         const randomIdeas = [
-            '신비로운 숲 속의 마법사',
-            '미래 도시의 스카이라인',
-            '평화로운 호수가 있는 산 풍경',
-            '우주 정거장에서 바라본 지구',
-            '고대 성 안의 도서관',
-            '꽃이 가득한 아름다운 정원',
-            '바다 위를 나는 드래곤',
-            '눈 덮인 산맥과 오로라',
-            '사이버펑크 스타일의 거리',
-            '판타지 세계의 떠다니는 섬'
+            'mysterious wizard in enchanted forest',
+            'futuristic city skyline at sunset',
+            'peaceful mountain lake landscape',
+            'earth view from space station',
+            'ancient castle library with magical books',
+            'beautiful garden full of colorful flowers',
+            'majestic dragon flying over ocean',
+            'snow covered mountains with aurora',
+            'cyberpunk street with neon lights',
+            'floating fantasy island in sky'
         ];
 
         // Apply random selections
@@ -795,8 +795,10 @@ class ImageGenerator {
     
     async generateWithHuggingFace(prompt) {
         try {
+            console.log('Attempting to generate with prompt:', prompt);
+            
             const apiKey = this.apiKeyInput.value.trim();
-            const model = "runwayml/stable-diffusion-v1-5";
+            const model = "stabilityai/stable-diffusion-2-1";
             
             const headers = {
                 'Content-Type': 'application/json',
@@ -805,21 +807,22 @@ class ImageGenerator {
             // Add API key if provided, otherwise use free tier
             if (apiKey) {
                 headers['Authorization'] = `Bearer ${apiKey}`;
+                console.log('Using provided API key');
+            } else {
+                console.log('Using free tier (no API key)');
             }
+            
+            this.promptCreator.showToast('AI 이미지 생성 중...', 'info');
             
             const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({
-                    inputs: prompt,
-                    parameters: {
-                        num_inference_steps: 20,
-                        guidance_scale: 7.5,
-                        width: 512,
-                        height: 512
-                    }
+                    inputs: prompt
                 })
             });
+            
+            console.log('API Response status:', response.status);
             
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
