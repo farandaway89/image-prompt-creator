@@ -798,43 +798,67 @@ class ImageGenerator {
             console.log('Attempting to generate with prompt:', prompt);
             
             const apiKey = this.apiKeyInput.value.trim();
-            const model = "stabilityai/stable-diffusion-2-1";
             
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-            
-            // Add API key if provided, otherwise use free tier
-            if (apiKey) {
-                headers['Authorization'] = `Bearer ${apiKey}`;
-                console.log('Using provided API key');
-            } else {
-                console.log('Using free tier (no API key)');
+            if (!apiKey) {
+                console.log('No API key provided, skipping API call');
+                this.promptCreator.showToast('API 키가 필요합니다. 키를 입력하거나 Canvas 생성을 사용하세요.', 'info');
+                return false;
             }
             
+            const model = "runwayml/stable-diffusion-v1-5";
+            
+            const headers = {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+                'User-Agent': 'AI-Image-Generator/1.0'
+            };
+            
+            console.log('Using provided API key for model:', model);
             this.promptCreator.showToast('AI 이미지 생성 중...', 'info');
             
             const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({
-                    inputs: prompt
+                    inputs: prompt,
+                    parameters: {
+                        num_inference_steps: 20,
+                        guidance_scale: 7.5
+                    },
+                    options: {
+                        wait_for_model: true
+                    }
                 })
             });
             
             console.log('API Response status:', response.status);
+            console.log('API Response headers:', [...response.headers.entries()]);
             
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
+                let errorMessage = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.text();
+                    console.log('Error response:', errorData);
+                    errorMessage += `: ${errorData}`;
+                } catch (e) {
+                    console.log('Could not read error response');
+                }
                 
                 if (response.status === 503) {
-                    this.promptCreator.showToast('모델 로딩 중... 잠시 후 다시 시도해주세요.', 'error');
+                    this.promptCreator.showToast('모델 로딩 중... 30초 후 다시 시도해주세요.', 'error');
                     return false;
                 } else if (response.status === 429) {
-                    this.promptCreator.showToast('요청 한도 초과. API 키를 입력하거나 잠시 후 다시 시도해주세요.', 'error');
+                    this.promptCreator.showToast('요청 한도 초과. 잠시 후 다시 시도해주세요.', 'error');
+                    return false;
+                } else if (response.status === 401) {
+                    this.promptCreator.showToast('API 키가 유효하지 않습니다. 키를 확인해주세요.', 'error');
+                    return false;
+                } else if (response.status === 400) {
+                    this.promptCreator.showToast('잘못된 요청입니다. 프롬프트를 확인해주세요.', 'error');
                     return false;
                 } else {
-                    throw new Error(`API Error: ${response.status}`);
+                    this.promptCreator.showToast(`API 오류 (${response.status}): ${errorMessage}`, 'error');
+                    return false;
                 }
             }
             
@@ -847,12 +871,15 @@ class ImageGenerator {
         } catch (error) {
             console.error('Hugging Face API error:', error);
             
-            if (error.message.includes('fetch')) {
-                this.promptCreator.showToast('네트워크 오류. 인터넷 연결을 확인해주세요.', 'error');
+            if (error.message.includes('fetch') || error.name === 'TypeError') {
+                this.promptCreator.showToast(`네트워크 오류: ${error.message}`, 'error');
+            } else if (error.message.includes('CORS')) {
+                this.promptCreator.showToast('CORS 오류. API 접근이 차단되었습니다.', 'error');
             } else {
-                this.promptCreator.showToast('API 호출 실패. Canvas 생성으로 전환합니다.', 'info');
+                this.promptCreator.showToast(`API 오류: ${error.message}`, 'error');
             }
             
+            console.log('Falling back to Canvas generation');
             return false;
         }
     }
