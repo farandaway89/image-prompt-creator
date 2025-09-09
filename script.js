@@ -850,8 +850,9 @@ class ImageGenerator {
                 } else if (response.status === 429) {
                     this.promptCreator.showToast('요청 한도 초과. 잠시 후 다시 시도해주세요.', 'error');
                     return false;
-                } else if (response.status === 401) {
-                    this.promptCreator.showToast('API 키가 유효하지 않습니다. 키를 확인해주세요.', 'error');
+                } else if (response.status === 401 || response.status === 403) {
+                    this.promptCreator.showToast('API 키 권한이 부족합니다. Inference Endpoints 권한이 있는 새 토큰을 생성해주세요.', 'error');
+                    console.log('API 키 권한 문제: https://huggingface.co/settings/tokens 에서 "Inference API" 또는 "write" 권한으로 새 토큰 생성');
                     return false;
                 } else if (response.status === 400) {
                     this.promptCreator.showToast('잘못된 요청입니다. 프롬프트를 확인해주세요.', 'error');
@@ -1247,14 +1248,13 @@ class ImageGenerator {
     }
     
     darkenColor(color) {
-        // Simple color darkening
-        const factor = 0.6;
-        return color + Math.floor(255 * factor).toString(16).padStart(2, '0');
+        // Simple color darkening - return original color with opacity
+        return color + '99';
     }
     
     brightenColor(color) {
-        // Simple color brightening
-        return color + 'CC';
+        // Simple color brightening - return original color with opacity
+        return color + 'DD';
     }
     
     showLoading() {
