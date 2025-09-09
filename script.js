@@ -809,7 +809,8 @@ class ImageGenerator {
             const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     inputs: "a beautiful cat"
@@ -859,7 +860,8 @@ class ImageGenerator {
             const response = await fetch(`https://api-inference.huggingface.co/models/${workingModel}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     inputs: prompt
