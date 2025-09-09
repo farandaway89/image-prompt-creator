@@ -847,6 +847,19 @@ textarea {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.api-key-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.api-key-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
 .image-header h4 {
   font-size: var(--font-size-lg);
   font-weight: 700;

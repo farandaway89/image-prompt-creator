@@ -728,12 +728,38 @@ class ImageGenerator {
         this.currentImageBlob = null;
         this.setupEventListeners();
         this.setupCanvas();
+        this.loadSavedAPIKey();
     }
     
     setupEventListeners() {
         this.generateBtn.addEventListener('click', () => this.generateImage());
         this.downloadBtn.addEventListener('click', () => this.downloadImage());
         this.regenerateBtn.addEventListener('click', () => this.generateImage());
+        
+        // Auto-save API key when user types
+        this.apiKeyInput.addEventListener('input', () => this.saveAPIKey());
+        this.apiKeyInput.addEventListener('paste', () => {
+            // Small delay to allow paste to complete
+            setTimeout(() => this.saveAPIKey(), 100);
+        });
+    }
+    
+    saveAPIKey() {
+        const apiKey = this.apiKeyInput.value.trim();
+        if (apiKey && apiKey.length > 10) {
+            // Only save if it looks like a valid API key
+            localStorage.setItem('hf_api_key', apiKey);
+            console.log('🔑 API key saved securely in browser');
+        }
+    }
+    
+    loadSavedAPIKey() {
+        const savedKey = localStorage.getItem('hf_api_key');
+        if (savedKey) {
+            this.apiKeyInput.value = savedKey;
+            this.apiKeyInput.style.borderColor = '#43e97b'; // Green border to indicate saved
+            console.log('🔑 API key loaded from browser storage');
+        }
     }
     
     setupCanvas() {

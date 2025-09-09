@@ -249,9 +249,12 @@
                             <div class="image-header">
                                 <h4>✨ AI 이미지 생성</h4>
                                 <div class="image-controls">
-                                    <input type="password" id="api-key-input" 
-                                           placeholder="Hugging Face API Key (선택사항)" 
-                                           class="api-key-input">
+                                    <div class="api-key-group">
+                                        <input type="password" id="api-key-input" 
+                                               placeholder="Hugging Face API Key" 
+                                               class="api-key-input">
+                                        <small class="api-key-hint">🔑 입력하면 자동으로 브라우저에 안전하게 저장됩니다</small>
+                                    </div>
                                     <button class="btn btn-primary" id="generate-image-btn" disabled>
                                         <i class="fas fa-image"></i>
                                         이미지 생성하기
