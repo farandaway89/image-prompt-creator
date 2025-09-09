@@ -951,7 +951,7 @@ class ImagePromptCreator {
         }
 
         // Update image generation section
-        const imageGenTitle = document.querySelector('.image-generation h3');
+        const imageGenTitle = document.querySelector('.image-header h4');
         if (imageGenTitle) {
             imageGenTitle.textContent = this.isEnglishMode ? '✨ AI Image Generation' : '✨ AI 이미지 생성';
         }
@@ -964,7 +964,7 @@ class ImagePromptCreator {
         }
 
         // Update template section
-        const templateTitle = document.querySelector('.templates h3');
+        const templateTitle = document.querySelector('.templates-section h3');
         if (templateTitle) {
             templateTitle.textContent = this.isEnglishMode ? 'Preset Templates' : '프리셋 템플릿';
         }
