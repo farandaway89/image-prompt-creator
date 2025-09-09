@@ -248,10 +248,15 @@
                         <div class="image-generation-section">
                             <div class="image-header">
                                 <h4>✨ AI 이미지 생성</h4>
-                                <button class="btn btn-primary" id="generate-image-btn" disabled>
-                                    <i class="fas fa-image"></i>
-                                    이미지 생성하기
-                                </button>
+                                <div class="image-controls">
+                                    <input type="password" id="api-key-input" 
+                                           placeholder="Hugging Face API Key (선택사항)" 
+                                           class="api-key-input">
+                                    <button class="btn btn-primary" id="generate-image-btn" disabled>
+                                        <i class="fas fa-image"></i>
+                                        이미지 생성하기
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="image-canvas-container">

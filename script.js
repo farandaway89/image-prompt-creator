@@ -638,6 +638,9 @@ class ImagePromptCreator {
         if (type === 'error') {
             toast.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
             toastIcon.className = 'fas fa-exclamation-circle';
+        } else if (type === 'info') {
+            toast.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+            toastIcon.className = 'fas fa-info-circle';
         } else {
             toast.style.background = 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)';
             toastIcon.className = 'fas fa-check-circle';
@@ -720,7 +723,9 @@ class ImageGenerator {
         this.downloadBtn = document.getElementById('download-image-btn');
         this.regenerateBtn = document.getElementById('regenerate-btn');
         this.imageActions = document.getElementById('image-actions');
+        this.apiKeyInput = document.getElementById('api-key-input');
         
+        this.currentImageBlob = null;
         this.setupEventListeners();
         this.setupCanvas();
     }
@@ -750,7 +755,7 @@ class ImageGenerator {
         this.generateBtn.style.cursor = 'pointer';
     }
     
-    generateImage() {
+    async generateImage() {
         if (!this.promptCreator.currentPrompt) {
             this.promptCreator.showToast('먼저 프롬프트를 생성해주세요!', 'error');
             return;
@@ -758,15 +763,122 @@ class ImageGenerator {
         
         this.showLoading();
         
-        // Parse prompt for image generation
-        const promptData = this.parsePrompt(this.promptCreator.currentPrompt);
-        
-        // Generate image based on prompt
-        setTimeout(() => {
-            this.createAbstractArt(promptData);
+        try {
+            // Extract clean prompt for image generation
+            const cleanPrompt = this.extractImagePrompt(this.promptCreator.currentPrompt);
+            
+            // Try Hugging Face API first, fallback to Canvas if failed
+            const success = await this.generateWithHuggingFace(cleanPrompt);
+            
+            if (!success) {
+                // Fallback to Canvas generation
+                const promptData = this.parsePrompt(this.promptCreator.currentPrompt);
+                this.createAbstractArt(promptData);
+                this.promptCreator.showToast('Using fallback Canvas generation', 'info');
+            }
+            
             this.hideLoading();
             this.showImageActions();
-        }, 2000);
+            
+        } catch (error) {
+            console.error('Image generation failed:', error);
+            this.hideLoading();
+            this.promptCreator.showToast('이미지 생성에 실패했습니다. 다시 시도해주세요.', 'error');
+        }
+    }
+    
+    extractImagePrompt(fullPrompt) {
+        // Extract main prompt without negative prompts
+        const parts = fullPrompt.split('\n\nNegative prompt:');
+        return parts[0].trim();
+    }
+    
+    async generateWithHuggingFace(prompt) {
+        try {
+            const apiKey = this.apiKeyInput.value.trim();
+            const model = "runwayml/stable-diffusion-v1-5";
+            
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            
+            // Add API key if provided, otherwise use free tier
+            if (apiKey) {
+                headers['Authorization'] = `Bearer ${apiKey}`;
+            }
+            
+            const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    inputs: prompt,
+                    parameters: {
+                        num_inference_steps: 20,
+                        guidance_scale: 7.5,
+                        width: 512,
+                        height: 512
+                    }
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                
+                if (response.status === 503) {
+                    this.promptCreator.showToast('모델 로딩 중... 잠시 후 다시 시도해주세요.', 'error');
+                    return false;
+                } else if (response.status === 429) {
+                    this.promptCreator.showToast('요청 한도 초과. API 키를 입력하거나 잠시 후 다시 시도해주세요.', 'error');
+                    return false;
+                } else {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+            }
+            
+            const imageBlob = await response.blob();
+            await this.displayGeneratedImage(imageBlob);
+            
+            this.promptCreator.showToast('AI 이미지 생성 완료!', 'success');
+            return true;
+            
+        } catch (error) {
+            console.error('Hugging Face API error:', error);
+            
+            if (error.message.includes('fetch')) {
+                this.promptCreator.showToast('네트워크 오류. 인터넷 연결을 확인해주세요.', 'error');
+            } else {
+                this.promptCreator.showToast('API 호출 실패. Canvas 생성으로 전환합니다.', 'info');
+            }
+            
+            return false;
+        }
+    }
+    
+    async displayGeneratedImage(blob) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = () => {
+                // Clear canvas and draw the image
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
+                
+                // Store blob for download
+                this.currentImageBlob = blob;
+                
+                // Clean up
+                URL.revokeObjectURL(url);
+                resolve();
+            };
+            
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                reject(new Error('Failed to load generated image'));
+            };
+            
+            img.src = url;
+        });
     }
     
     parsePrompt(prompt) {
@@ -1135,8 +1247,20 @@ class ImageGenerator {
     downloadImage() {
         const link = document.createElement('a');
         link.download = `ai-generated-image-${Date.now()}.png`;
-        link.href = this.canvas.toDataURL();
+        
+        // Use original AI image if available, otherwise use canvas
+        if (this.currentImageBlob) {
+            link.href = URL.createObjectURL(this.currentImageBlob);
+        } else {
+            link.href = this.canvas.toDataURL();
+        }
+        
         link.click();
+        
+        // Clean up object URL if used
+        if (this.currentImageBlob) {
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+        }
         
         this.promptCreator.showToast('이미지가 다운로드되었습니다!');
     }

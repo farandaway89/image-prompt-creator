@@ -818,10 +818,33 @@ textarea {
 }
 
 .image-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: var(--spacing-md);
+}
+
+.image-controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-sm);
+}
+
+.api-key-input {
+  flex: 1;
+  min-width: 200px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: var(--border-radius);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  transition: all 0.3s ease;
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: var(--text-accent);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .image-header h4 {
