@@ -59,6 +59,38 @@ class ImagePromptCreator {
         this.initializeLanguage();
     }
 
+    initializeLanguage() {
+        const langIndicator = this.elements.languageToggle.querySelector('.lang-indicator');
+        langIndicator.textContent = this.isEnglishMode ? 'EN' : 'KO';
+        
+        if (this.isEnglishMode) {
+            this.elements.languageToggle.classList.add('active');
+            this.elements.languageToggle.title = 'English ↔ Korean prompts (Currently: English)';
+        } else {
+            this.elements.languageToggle.classList.remove('active');
+            this.elements.languageToggle.title = '한국어 ↔ 영어 프롬프트 (현재: 한국어)';
+        }
+    }
+    
+    updateCharCounters() {
+        // Update all character counters
+        const basicCounter = this.elements.basicIdea.parentNode.querySelector('.char-counter');
+        if (basicCounter) {
+            const length = this.elements.basicIdea.value.length;
+            basicCounter.textContent = `${length}/200`;
+            basicCounter.style.color = length > 180 ? '#f56565' : '#718096';
+        }
+        
+        if (this.elements.additionalDetails) {
+            const additionalCounter = this.elements.additionalDetails.parentNode.querySelector('.char-counter');
+            if (additionalCounter) {
+                const length = this.elements.additionalDetails.value.length;
+                additionalCounter.textContent = `${length}/300`;
+                additionalCounter.style.color = length > 280 ? '#f56565' : '#718096';
+            }
+        }
+    }
+
     setupEventListeners() {
         // Main buttons
         this.elements.generateBtn.addEventListener('click', () => this.generatePrompt());
