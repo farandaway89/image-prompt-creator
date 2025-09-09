@@ -749,7 +749,7 @@ class ImagePromptCreator {
                 regenerateBtn: '재생성',
                 apiKeyLabel: 'Hugging Face API 키',
                 apiKeyPlaceholder: 'hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                apiKeyHint: '키는 자동으로 저장됩니다',
+                apiKeyHint: '🔑 입력하면 자동으로 브라우저에 안전하게 저장됩니다',
                 
                 // Results
                 resultTitle: '생성된 프롬프트',
@@ -805,7 +805,7 @@ class ImagePromptCreator {
                 regenerateBtn: 'Regenerate',
                 apiKeyLabel: 'Hugging Face API Key',
                 apiKeyPlaceholder: 'hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                apiKeyHint: 'Key will be saved automatically',
+                apiKeyHint: '🔑 Key will be saved securely in browser',
                 
                 // Results
                 resultTitle: 'Generated Prompt',
@@ -910,23 +910,22 @@ class ImagePromptCreator {
         if (apiKeyHint) apiKeyHint.textContent = t.apiKeyHint;
 
         // Update result section titles
-        const resultTitle = document.querySelector('.result-title');
+        const resultTitle = document.querySelector('.result-header h3');
         if (resultTitle) resultTitle.textContent = t.resultTitle;
 
         const statsTitle = document.querySelector('.stats h3');
         if (statsTitle) statsTitle.textContent = t.statsTitle;
 
-        // Update stats labels
-        const wordCountLabel = document.querySelector('.stat-item:nth-child(1) .stat-label');
-        const charCountLabel = document.querySelector('.stat-item:nth-child(2) .stat-label');
-        const complexityLabel = document.querySelector('.stat-item:nth-child(3) .stat-label');
-        
-        if (wordCountLabel) wordCountLabel.textContent = t.wordCount;
-        if (charCountLabel) charCountLabel.textContent = t.charCount;
-        if (complexityLabel) complexityLabel.textContent = t.complexity;
+        // Update stats labels (using correct selectors for HTML structure)
+        const statLabels = document.querySelectorAll('.stat-label');
+        if (statLabels.length >= 3) {
+            statLabels[0].textContent = t.wordCount + ':';
+            statLabels[1].textContent = t.charCount + ':';  
+            statLabels[2].textContent = t.complexity + ':';
+        }
 
         // Update history section
-        const historyTitle = document.querySelector('.history h3');
+        const historyTitle = document.querySelector('.history-header h3');
         if (historyTitle) historyTitle.textContent = t.historyTitle;
         
         if (this.elements.clearHistory) {
